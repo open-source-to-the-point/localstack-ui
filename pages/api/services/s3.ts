@@ -7,9 +7,14 @@ interface IBucketDetails {
     creationTime: string;
 };
 
-class S3Service extends S3 {
-    async getBucketDetails(): Promise<IBucketDetails[]> {
-        const { Buckets: buckets } = await this.listBuckets({});
+class S3Service {
+    private s3: S3;
+    constructor(s3Config: Record<string, unknown>) {
+        this.s3 = new S3(s3Config);
+    }
+
+    async listBuckets(): Promise<IBucketDetails[]> {
+        const { Buckets: buckets } = await this.s3.listBuckets({});
         if (!buckets) {
             return [];
         }
@@ -24,6 +29,10 @@ class S3Service extends S3 {
                 creationTime,
             };
         });
+    }
+
+    async listObjects(): Promise<void> {
+        return;
     }
 }
 
