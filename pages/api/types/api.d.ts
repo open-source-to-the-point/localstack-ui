@@ -1,11 +1,11 @@
 declare namespace API {
     interface SUCCESS<T> {
-        message: string;
+        code: string;
         data: T;
     }
 
     interface ERROR {
-        message: string;
+        code: string;
         error: Error | unknown;
     }
 }

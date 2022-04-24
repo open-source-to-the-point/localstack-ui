@@ -1,19 +1,23 @@
-import { ListBucketsOutput, S3 } from '@aws-sdk/client-s3';
+import { S3 } from '@aws-sdk/client-s3';
 import config from 'pages/config';
 
-interface IBucketDetails {
+interface IBucketList {
     name: string;
     creationDate: string;
     creationTime: string;
 };
 
+interface IObjectList {
+
+}
+
 class S3Service {
     private s3: S3;
-    constructor(s3Config: Record<string, unknown>) {
-        this.s3 = new S3(s3Config);
+    constructor() {
+        this.s3 = new S3(config.aws);
     }
 
-    async listBuckets(): Promise<IBucketDetails[]> {
+    async listBuckets(): Promise<IBucketList[]> {
         const { Buckets: buckets } = await this.s3.listBuckets({});
         if (!buckets) {
             return [];
@@ -31,9 +35,12 @@ class S3Service {
         });
     }
 
-    async listObjects(): Promise<void> {
+    async listObjects({ bucket }: { bucket: string }): Promise<void | IObjectList[]> {
+        if (!bucket) return [];
+        const response = await this.s3.listObjectsV2({ Bucket: bucket });
+        console.log("++++++", response);
         return;
     }
 }
 
-export default new S3Service(config.aws);
+export default new S3Service();

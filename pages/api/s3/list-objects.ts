@@ -7,13 +7,15 @@ interface IListObjects {
 }
 
 export default async function handler(
-    _req: NextApiRequest,
+    req: NextApiRequest,
     res: NextApiResponse<API.SUCCESS<IListObjects[]> | API.ERROR>
 ) {
     try {
-        const bucketDetails = await s3Service.listObjects();
-        res.status(status.OK).json({ message: status[200], data: [] });
+        const { bucket } = req.query as { bucket: string };
+        const bucketDetails = await s3Service.listObjects({ bucket });
+        res.status(status.OK).json({ code: status[200], data: [] });
     } catch (error: unknown) {
-        res.status(status.INTERNAL_SERVER_ERROR).json({ message: 'Error occurred while fetching bucket details', error });
+        console.error(error);
+        res.status(status.INTERNAL_SERVER_ERROR).json({ code: 'LIST_OBJECTS_FAILED', error: error });;
     }
 }
