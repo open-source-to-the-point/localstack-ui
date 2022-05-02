@@ -38,7 +38,6 @@ class S3Service {
     async listObjects({ bucket }: { bucket: string }): Promise<void | IObjectList[]> {
         if (!bucket) return [];
         const response = await this.s3.listObjectsV2({ Bucket: bucket });
-        console.log("++++++", response);
         return;
     }
 }

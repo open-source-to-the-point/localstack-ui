@@ -7,11 +7,14 @@ function BucketDetails({ data }: any) {
     return <h2>{bucketName}</h2>;
 }
 
-// export async function getServerSideProps() {
-//     const response = await fetch(config.ui.s3.listBuckets);
-//     const { data } = await response.json();
+export async function getServerSideProps() {
+    const response = await fetch(config.ui.s3.listBuckets);
+    if (response.status !== 200) {
+        return { props: {} };
+    }
 
-//     return { props: { data } };
-// }
+    const { data } = await response.json();
+    return { props: { data } };
+}
 
 export default BucketDetails;
