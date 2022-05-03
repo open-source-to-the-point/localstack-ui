@@ -1,6 +1,5 @@
 import { S3 } from "@aws-sdk/client-s3";
 import { getLocaleTime } from "src/utils/get-locale-time";
-import config from "src/pages/config";
 
 interface IBucket {
   name: string;
@@ -17,10 +16,16 @@ export interface IListObjects {
   }[];
 }
 
+const AWS_CONFIG = {
+  endpoint: "http://localhost:4566",
+  sslEnabled: false,
+  forcePathStyle: true,
+};
+
 class S3Service {
   private s3: S3;
   constructor() {
-    this.s3 = new S3(config.aws);
+    this.s3 = new S3(AWS_CONFIG);
   }
 
   createBucket(bucket: string) {

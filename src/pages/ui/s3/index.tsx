@@ -1,5 +1,5 @@
 import Buckets from "@components/buckets";
-import config from "src/pages/config";
+import apiRoutes from "@configs/apiRoutes";
 
 function S3Main({ data }: any) {
   if (!data)
@@ -30,7 +30,7 @@ function S3Main({ data }: any) {
 }
 
 export async function getServerSideProps() {
-  const response = await fetch(config.ui.s3.listBuckets);
+  const response = await fetch(apiRoutes.ui.s3.listBuckets);
   if (response.status !== 200) {
     return { props: {} };
   }
