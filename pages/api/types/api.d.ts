@@ -6,6 +6,6 @@ declare namespace API {
 
     interface ERROR {
         code: string;
-        error: Error | unknown;
+        error?: Error | unknown;
     }
 }
