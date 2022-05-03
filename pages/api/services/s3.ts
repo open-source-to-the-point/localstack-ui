@@ -23,6 +23,14 @@ class S3Service {
         this.s3 = new S3(config.aws);
     }
 
+    createBucket(bucket: string) {
+        return this.s3.createBucket({ Bucket: bucket });
+    }
+
+    deleteBucket(bucket: string) {
+        return this.s3.deleteBucket({ Bucket: bucket });
+    }
+
     async listBuckets(): Promise<IBucket[]> {
         const { Buckets: buckets } = await this.s3.listBuckets({});
         if (!buckets) {
