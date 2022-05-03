@@ -1,14 +1,20 @@
 import { S3 } from '@aws-sdk/client-s3';
+import { getLocaleTime } from '@pages/utils/get-locale-time';
 import config from 'pages/config';
 
-interface IBucketList {
+interface IBucket {
     name: string;
     creationDate: string;
     creationTime: string;
 };
 
-interface IObjectList {
-
+export interface IListObjects {
+    dirs: string[],
+    objects: {
+        key: string,
+        lastModifiedDate: string,
+        lastModifiedTime: string
+    }[]
 }
 
 class S3Service {
@@ -17,7 +23,7 @@ class S3Service {
         this.s3 = new S3(config.aws);
     }
 
-    async listBuckets(): Promise<IBucketList[]> {
+    async listBuckets(): Promise<IBucket[]> {
         const { Buckets: buckets } = await this.s3.listBuckets({});
         if (!buckets) {
             return [];
@@ -25,7 +31,7 @@ class S3Service {
 
         return buckets.map(bucket => {
             const { Name: name = 'NAME_NOT_CONFIGURED', CreationDate } = bucket;
-            const [creationDate, creationTime] = new Date(CreationDate as unknown as string).toLocaleString().split(',');
+            const [creationDate, creationTime] = getLocaleTime(CreationDate);
 
             return {
                 name,
@@ -35,11 +41,17 @@ class S3Service {
         });
     }
 
-    async listObjects({ bucket }: { bucket: string }): Promise<void | IObjectList[]> {
-        if (!bucket) return [];
-        const response = await this.s3.listObjectsV2({ Bucket: bucket });
-        console.log("++++++", response);
-        return;
+    async listObjects({ bucket, dir }: { bucket: string, dir: string }): Promise<IListObjects> {
+        if (!bucket) throw new Error('Bucket not specified');
+        const response = await this.s3.listObjectsV2({ Bucket: bucket, Delimiter: `/${dir ? dir : ''}`, MaxKeys: 1000 });
+
+        const dirs = response?.CommonPrefixes?.map(({ Prefix }) => Prefix) || [];
+        const objects = response?.Contents?.map(({ Key, LastModified }) => {
+            const [lastModifiedDate, lastModifiedTime] = getLocaleTime(LastModified);
+            return { key: Key, lastModifiedDate, lastModifiedTime };
+        }) || [];
+
+        return { dirs, objects } as IListObjects;
     }
 }
 

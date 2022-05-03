@@ -3,7 +3,7 @@ const config = {
         return {
             endpoint: 'http://localhost:4566',
             sslEnabled: false,
-            s3ForcePathStyle: true
+            forcePathStyle: true
         };
     },
     get ui() {
