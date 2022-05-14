@@ -1,4 +1,5 @@
-import { S3 } from "@aws-sdk/client-s3";
+import { GetObjectCommand, PutObjectCommand, S3 } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { getLocaleTime } from "src/utils/get-locale-time";
 
 interface IBucket {
@@ -17,10 +18,11 @@ export interface IListObjects {
 }
 
 const AWS_CONFIG = {
-  endpoint: "http://localhost:4566",
-  sslEnabled: false,
-  forcePathStyle: true,
+  endpoint: process.env.AWS_ENDPOINT || "http://localhost:4566",
+  sslEnabled: process.env.AWS_ENDPOINT_SSL_ENABLED === 'true' || false,
+  forcePathStyle: process.env.AWS_S3_FORCE_PATH_STYLE === 'true' || true,
 };
+const PRESIGNED_URL_EXPIRY = Number(process.env.AWS_S3_PRESIGNED_URL_EXPIRY) || 3600;
 
 class S3Service {
   private s3: S3;
@@ -54,6 +56,20 @@ class S3Service {
     });
   }
 
+  async getPresignedUrl({ bucket, key, action = 'GET' }: { bucket: string, key: string, action: string }): Promise<string> {
+    const supportedActions: Record<string, GetObjectCommand | PutObjectCommand> = {
+      'GET': new GetObjectCommand({ Bucket: bucket, Key: key }),
+      'PUT': new PutObjectCommand({ Bucket: bucket, Key: key }),
+    };
+
+    if (!supportedActions[action]) {
+      throw new Error('GetPresignedUrl: INVALID ACTION');
+    }
+
+    const url = await getSignedUrl(this.s3 as any, supportedActions[action] as any, { expiresIn: PRESIGNED_URL_EXPIRY });
+    return url;
+  }
+
   async listObjects({
     bucket,
     dir,
@@ -64,6 +80,7 @@ class S3Service {
     if (!bucket) throw new Error("Bucket not specified");
     const response = await this.s3.listObjectsV2({
       Bucket: bucket,
+      Prefix: `${dir ? dir : ""}`,
       Delimiter: `/${dir ? dir : ""}`,
       MaxKeys: 1000,
     });
