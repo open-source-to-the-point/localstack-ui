@@ -95,6 +95,10 @@ class S3Service {
 
     return { dirs, objects } as IListObjects;
   }
+
+  async deleteObject({ bucket, key }: { bucket: string, key: string }): Promise<void> {
+    await this.s3.deleteObject({ Bucket: bucket, Key: key });
+  }
 }
 
 export default new S3Service();
