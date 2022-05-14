@@ -95,6 +95,22 @@ class S3Service {
 
     return { dirs, objects } as IListObjects;
   }
+
+  async deleteObject({ bucket, key }: { bucket: string, key: string }): Promise<void> {
+    await this.s3.deleteObject({ Bucket: bucket, Key: key });
+  }
+
+  async deleteDir({ bucket, dir }: { bucket: string; dir: string }): Promise<void> {
+    const dirObjects = await this.s3.listObjectsV2({ Bucket: bucket, Prefix: dir });
+    if (!dirObjects.Contents || dirObjects.Contents.length === 0) return;
+
+    await this.s3.deleteObjects({
+      Bucket: bucket,
+      Delete: {
+        Objects: dirObjects.Contents.map(({ Key }) => ({ Key })),
+      }
+    });
+  }
 }
 
 export default new S3Service();
