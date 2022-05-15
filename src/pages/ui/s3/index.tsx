@@ -1,4 +1,4 @@
-import Buckets from "@components/buckets";
+import Buckets from "@components/s3/buckets";
 import apiRoutes from "@configs/apiRoutes";
 
 function S3Main({ data }: any) {

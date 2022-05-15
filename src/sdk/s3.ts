@@ -64,7 +64,8 @@ class S3Service {
     if (!bucket) throw new Error("Bucket not specified");
     const response = await this.s3.listObjectsV2({
       Bucket: bucket,
-      Delimiter: `/${dir ? dir : ""}`,
+      Prefix: dir || "",
+      Delimiter: "/",
       MaxKeys: 1000,
     });
 
