@@ -27,12 +27,14 @@ import { useRouter } from "next/router";
 interface IListHeaderProps {
   bucketList: any;
   selectedIds: GridRowId[] | undefined;
+  setSnackbarSeverity: React.Dispatch<React.SetStateAction<AlertColor>>;
   setSnackbarMsg: React.Dispatch<React.SetStateAction<string>>;
   openSnackbar: () => void;
 }
 const ListHeader: React.FC<IListHeaderProps> = ({
   bucketList,
   selectedIds,
+  setSnackbarSeverity,
   setSnackbarMsg: setCreationMsg,
   openSnackbar: openCreationSnackbar,
 }) => {
@@ -62,13 +64,18 @@ const ListHeader: React.FC<IListHeaderProps> = ({
     );
     if (response.status !== 200) {
       console.debug(response);
+      setSnackbarSeverity("error");
+      setCreationMsg(`Error while creating "${bucketName}"`);
+      openCreationSnackbar();
+      return;
     }
 
     const { data } = await response.json();
+    setSnackbarSeverity("success");
     setCreationMsg(`"${bucketName}" successfully created`);
     openCreationSnackbar();
     router.replace(router.asPath);
-  }, [bucketName, openCreationSnackbar, router, setCreationMsg]);
+  }, [bucketName, openCreationSnackbar, router, setCreationMsg, setSnackbarSeverity]);
 
   return (
     <>
