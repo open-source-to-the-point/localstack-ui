@@ -9,6 +9,7 @@ import {
   GridRowId,
 } from "@mui/x-data-grid";
 import {
+  AlertColor,
   Button,
   Dialog,
   DialogActions,
@@ -24,15 +25,15 @@ import AddCircleIcon from "@mui/icons-material/AddCircle";
 import apiRoutes from "@configs/apiRoutes";
 import { useRouter } from "next/router";
 
-interface IListHeaderProps {
-  bucketList: any;
+interface IObjectListHeaderProps {
+  objectList: any;
   selectedIds: GridRowId[] | undefined;
   setSnackbarSeverity: React.Dispatch<React.SetStateAction<AlertColor>>;
   setSnackbarMsg: React.Dispatch<React.SetStateAction<string>>;
   openSnackbar: () => void;
 }
-const ListHeader: React.FC<IListHeaderProps> = ({
-  bucketList,
+const ObjectListHeader: React.FC<IObjectListHeaderProps> = ({
+  objectList,
   selectedIds,
   setSnackbarSeverity,
   setSnackbarMsg: setCreationMsg,
@@ -75,16 +76,22 @@ const ListHeader: React.FC<IListHeaderProps> = ({
     setCreationMsg(`"${bucketName}" successfully created`);
     openCreationSnackbar();
     router.replace(router.asPath);
-  }, [bucketName, openCreationSnackbar, router, setCreationMsg, setSnackbarSeverity]);
+  }, [
+    bucketName,
+    openCreationSnackbar,
+    router,
+    setCreationMsg,
+    setSnackbarSeverity,
+  ]);
 
   return (
     <>
       <GridToolbarContainer className="p-4 flex flex-col">
         <div className="w-full flex justify-between">
           <div className="text-lg">
-            Buckets {bucketList.length > 0 ? `(${bucketList.length})` : ""}
+            Objects {objectList.length > 0 ? `(${objectList.length})` : ""}
           </div>
-          <div>
+          {/* <div>
             <Button
               variant="contained"
               startIcon={<AddCircleIcon />}
@@ -92,7 +99,7 @@ const ListHeader: React.FC<IListHeaderProps> = ({
             >
               Create Bucket
             </Button>
-          </div>
+          </div> */}
         </div>
         <div className="mt-4 w-full flex justify-end">
           <GridToolbarColumnsButton />
@@ -140,4 +147,4 @@ const ListHeader: React.FC<IListHeaderProps> = ({
   );
 };
 
-export default ListHeader;
+export default ObjectListHeader;
