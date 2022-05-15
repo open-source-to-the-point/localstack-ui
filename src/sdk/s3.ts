@@ -19,10 +19,11 @@ export interface IListObjects {
 
 const AWS_CONFIG = {
   endpoint: process.env.AWS_ENDPOINT || "http://localhost:4566",
-  sslEnabled: process.env.AWS_ENDPOINT_SSL_ENABLED === 'true' || false,
-  forcePathStyle: process.env.AWS_S3_FORCE_PATH_STYLE === 'true' || true,
+  sslEnabled: process.env.AWS_ENDPOINT_SSL_ENABLED === "true" || false,
+  forcePathStyle: process.env.AWS_S3_FORCE_PATH_STYLE === "true" || true,
 };
-const PRESIGNED_URL_EXPIRY = Number(process.env.AWS_S3_PRESIGNED_URL_EXPIRY) || 3600;
+const PRESIGNED_URL_EXPIRY =
+  Number(process.env.AWS_S3_PRESIGNED_URL_EXPIRY) || 3600;
 
 class S3Service {
   private s3: S3;
@@ -56,17 +57,32 @@ class S3Service {
     });
   }
 
-  async getPresignedUrl({ bucket, key, action = 'GET' }: { bucket: string, key: string, action: string }): Promise<string> {
-    const supportedActions: Record<string, GetObjectCommand | PutObjectCommand> = {
-      'GET': new GetObjectCommand({ Bucket: bucket, Key: key }),
-      'PUT': new PutObjectCommand({ Bucket: bucket, Key: key }),
+  async getPresignedUrl({
+    bucket,
+    key,
+    action = "GET",
+  }: {
+    bucket: string;
+    key: string;
+    action: string;
+  }): Promise<string> {
+    const supportedActions: Record<
+      string,
+      GetObjectCommand | PutObjectCommand
+    > = {
+      GET: new GetObjectCommand({ Bucket: bucket, Key: key }),
+      PUT: new PutObjectCommand({ Bucket: bucket, Key: key }),
     };
 
     if (!supportedActions[action]) {
-      throw new Error('GetPresignedUrl: INVALID ACTION');
+      throw new Error("GetPresignedUrl: INVALID ACTION");
     }
 
-    const url = await getSignedUrl(this.s3 as any, supportedActions[action] as any, { expiresIn: PRESIGNED_URL_EXPIRY });
+    const url = await getSignedUrl(
+      this.s3 as any,
+      supportedActions[action] as any,
+      { expiresIn: PRESIGNED_URL_EXPIRY }
+    );
     return url;
   }
 
@@ -80,8 +96,8 @@ class S3Service {
     if (!bucket) throw new Error("Bucket not specified");
     const response = await this.s3.listObjectsV2({
       Bucket: bucket,
-      Prefix: `${dir ? dir : ""}`,
-      Delimiter: `/${dir ? dir : ""}`,
+      Prefix: dir || "",
+      Delimiter: "/",
       MaxKeys: 1000,
     });
 
@@ -96,19 +112,34 @@ class S3Service {
     return { dirs, objects } as IListObjects;
   }
 
-  async deleteObject({ bucket, key }: { bucket: string, key: string }): Promise<void> {
+  async deleteObject({
+    bucket,
+    key,
+  }: {
+    bucket: string;
+    key: string;
+  }): Promise<void> {
     await this.s3.deleteObject({ Bucket: bucket, Key: key });
   }
 
-  async deleteDir({ bucket, dir }: { bucket: string; dir: string }): Promise<void> {
-    const dirObjects = await this.s3.listObjectsV2({ Bucket: bucket, Prefix: dir });
+  async deleteDir({
+    bucket,
+    dir,
+  }: {
+    bucket: string;
+    dir: string;
+  }): Promise<void> {
+    const dirObjects = await this.s3.listObjectsV2({
+      Bucket: bucket,
+      Prefix: dir,
+    });
     if (!dirObjects.Contents || dirObjects.Contents.length === 0) return;
 
     await this.s3.deleteObjects({
       Bucket: bucket,
       Delete: {
         Objects: dirObjects.Contents.map(({ Key }) => ({ Key })),
-      }
+      },
     });
   }
 }
