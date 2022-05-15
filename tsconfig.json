@@ -19,6 +19,9 @@
       "@pages/*": ["src/pages/*"],
       "@components/*": ["src/components/*"],
       "@configs/*": ["src/configs/*"],
+      "@hooks/*": ["src/hooks/*"],
+      "@utils/*": ["src/utils/*"],
+      "@interfaces/*": ["src/interfaces/*"],
       "@sdk/*": ["src/sdk/*"]
     }
   },

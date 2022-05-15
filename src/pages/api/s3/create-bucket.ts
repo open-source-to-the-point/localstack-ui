@@ -1,11 +1,11 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import status from "http-status";
 import s3Service from "@sdk/s3";
-import { IListBuckets } from "./list-buckets";
+import { IBucket } from "@interfaces/s3";
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<API.SUCCESS<IListBuckets[]> | API.ERROR>
+  res: NextApiResponse<API.SUCCESS<IBucket[]> | API.ERROR>
 ) {
   try {
     const { bucket } = req.query as { bucket: string; dir: string };

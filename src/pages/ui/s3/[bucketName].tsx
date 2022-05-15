@@ -84,9 +84,7 @@ const Breakcrumds = ({ bucketName, dir }: any) => {
     );
   }
 
-  console.log(dirPaths);
   dirPaths?.forEach((dirPath: string, index: number) => {
-    console.log(dirPath, index);
     dirs.push(dirPath);
     if (dirPaths.length - 1 === index) {
       breadcrumbs.push(
@@ -122,6 +120,7 @@ function BucketDetails({ objects }: any) {
   const router = useRouter();
   const { bucketName, dir } = router.query;
 
+  console.log(objects);
   return (
     <div>
       <Breakcrumds bucketName={bucketName} dir={dir} />
