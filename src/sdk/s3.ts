@@ -1,19 +1,15 @@
 import { GetObjectCommand, PutObjectCommand, S3 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { getLocaleTime } from "src/utils/get-locale-time";
-
-interface IBucket {
-  name: string;
-  creationDate: string;
-  creationTime: string;
-}
+import { IBucket } from "@interfaces/s3";
 
 export interface IListObjects {
   dirs: string[];
   objects: {
     key: string;
-    lastModifiedDate: string;
-    lastModifiedTime: string;
+    lastModified: Date;
+    eTag: string;
+    size: number;
+    storageClass: string;
   }[];
 }
 
@@ -45,14 +41,13 @@ class S3Service {
       return [];
     }
 
-    return buckets.map((bucket) => {
+    return buckets?.map((bucket) => {
       const { Name: name = "NAME_NOT_CONFIGURED", CreationDate } = bucket;
-      const [creationDate, creationTime] = getLocaleTime(CreationDate);
 
       return {
+        key: name,
         name,
-        creationDate,
-        creationTime,
+        creationDate: CreationDate,
       };
     });
   }
@@ -103,11 +98,17 @@ class S3Service {
 
     const dirs = response?.CommonPrefixes?.map(({ Prefix }) => Prefix) || [];
     const objects =
-      response?.Contents?.map(({ Key, LastModified }) => {
-        const [lastModifiedDate, lastModifiedTime] =
-          getLocaleTime(LastModified);
-        return { key: Key, lastModifiedDate, lastModifiedTime };
-      }) || [];
+      response?.Contents?.map(
+        ({ Key, LastModified, ETag, Size, StorageClass }) => {
+          return {
+            key: Key,
+            lastModified: LastModified,
+            eTag: ETag,
+            size: Size,
+            storageClass: StorageClass,
+          };
+        }
+      ) || [];
 
     return { dirs, objects } as IListObjects;
   }
