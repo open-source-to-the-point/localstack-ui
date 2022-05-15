@@ -6,6 +6,7 @@ const apiRoutes = {
     s3: {
       createBucket: `${API_S3_ENDPOINT}/create-bucket`,
       deleteBucket: `${API_S3_ENDPOINT}/delete-bucket`,
+      getPresignedUrl: `${API_S3_ENDPOINT}/pre-signed-url`,
       listBuckets: `${API_S3_ENDPOINT}/list-buckets`,
       listObjects: `${API_S3_ENDPOINT}/list-objects`,
     },

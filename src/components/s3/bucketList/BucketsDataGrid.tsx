@@ -1,7 +1,7 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/router";
 
-import ListHeader from "@components/s3/bucketList/ListHeader";
+import BucketListHeader from "@components/s3/bucketList/BucketListHeader";
 import {
   DataGrid,
   GridActionsCellItem,
@@ -10,24 +10,25 @@ import {
   GridRowParams,
   GridRenderCellParams,
   GridRowId,
+  GridValueFormatterParams,
 } from "@mui/x-data-grid";
 import Link from "@mui/material/Link";
 
 import DeleteIcon from "@mui/icons-material/Delete";
 
 import apiRoutes from "@configs/apiRoutes";
-import { getLocaleTime } from "@utils/get-locale-time";
+import { getLocaleTime, getLocateDate } from "@utils/get-locale-time";
 
 import { IBucket } from "@interfaces/s3";
 import { AlertColor } from "@mui/material";
 
-interface IBucketDataGridProps {
+interface IBucketsDataGridProps {
   bucketList: IBucket[];
   setSnackbarSeverity: React.Dispatch<React.SetStateAction<AlertColor>>;
   setSnackbarMsg: React.Dispatch<React.SetStateAction<string>>;
   openSnackbar: () => void;
 }
-const BucketDataGrid: React.FC<IBucketDataGridProps> = ({
+const BucketsDataGrid: React.FC<IBucketsDataGridProps> = ({
   bucketList,
   setSnackbarSeverity,
   setSnackbarMsg,
@@ -42,6 +43,7 @@ const BucketDataGrid: React.FC<IBucketDataGridProps> = ({
       headerName: "Name",
       minWidth: 400,
       flex: 1,
+      hideable: false,
       disableColumnMenu: true,
       renderCell: (params: GridRenderCellParams) => {
         const { name } = params.row;
@@ -52,21 +54,23 @@ const BucketDataGrid: React.FC<IBucketDataGridProps> = ({
     {
       field: "creationDate",
       headerName: "Date",
-      width: 250,
+      width: 300,
       disableColumnMenu: true,
-    },
-    {
-      field: "creationTime",
-      headerName: "Time",
-      width: 250,
-      disableColumnMenu: true,
+      valueFormatter: (params: GridValueFormatterParams) => {
+        if (params.value == null) {
+          return "";
+        }
+
+        return getLocateDate(new Date(params.value));
+      },
     },
   ];
   const actionColumns: GridActionsColDef[] = [
     {
-      field: "actions",
+      field: "Actions",
       type: "actions",
       width: 100,
+      hideable: false,
       align: "center",
       getActions: (params: GridRowParams) => [
         <GridActionsCellItem
@@ -98,24 +102,11 @@ const BucketDataGrid: React.FC<IBucketDataGridProps> = ({
     },
   ];
 
-  const formattedBucketList = useMemo(() => {
-    return bucketList.map((bucket) => {
-      const [creationDate, creationTime] = getLocaleTime(bucket.creationDate);
-
-      return {
-        ...bucket,
-        creationDate,
-        creationTime,
-      };
-    });
-  }, [bucketList]);
-
   return (
     <DataGrid
       columns={[...dataColumns, ...actionColumns]}
-      getRowId={(row: typeof formattedBucketList[number]) => row.key}
-      rows={formattedBucketList}
-      checkboxSelection
+      getRowId={(row: IBucket) => row.key}
+      rows={bucketList}
       disableSelectionOnClick
       hideFooterPagination={true}
       onSelectionModelChange={(ids) => {
@@ -123,8 +114,8 @@ const BucketDataGrid: React.FC<IBucketDataGridProps> = ({
       }}
       components={{
         Toolbar: () => (
-          <ListHeader
-            bucketList={formattedBucketList}
+          <BucketListHeader
+            bucketList={bucketList}
             selectedIds={selectedIds}
             setSnackbarSeverity={setSnackbarSeverity}
             setSnackbarMsg={setSnackbarMsg}
@@ -132,8 +123,17 @@ const BucketDataGrid: React.FC<IBucketDataGridProps> = ({
           />
         ),
       }}
+      componentsProps={{
+        panel: {
+          sx: {
+            [`& .MuiDataGrid-columnsPanel > div:last-of-type`]: {
+              display: "none",
+            },
+          },
+        },
+      }}
     />
   );
 };
 
-export default BucketDataGrid;
+export default BucketsDataGrid;

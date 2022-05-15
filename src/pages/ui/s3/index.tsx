@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import BucketDataGrid from "@components/s3/bucketList/BucketDataGrid";
+import BucketsDataGrid from "@components/s3/bucketList/BucketsDataGrid";
 import { Alert, AlertColor, Snackbar } from "@mui/material";
 import useModal from "@hooks/useModal";
 import apiRoutes from "@configs/apiRoutes";
@@ -29,7 +29,7 @@ const S3BucketList = ({ bucketList }: { bucketList: IBucket[] }) => {
   return (
     <>
       <div className="p-4 flex justify-center w-full h-full">
-        <BucketDataGrid
+        <BucketsDataGrid
           bucketList={bucketList}
           openSnackbar={openSnackbar}
           setSnackbarSeverity={setSnackbarSeverity}

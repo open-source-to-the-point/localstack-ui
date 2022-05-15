@@ -1,10 +1,14 @@
-import apiRoutes from "@configs/apiRoutes";
+import { useState } from "react";
 import { useRouter } from "next/router";
 
-import Breadcrumbs from "@mui/material/Breadcrumbs";
-import Typography from "@mui/material/Typography";
-import Link from "@mui/material/Link";
-import NavigateNextIcon from "@mui/icons-material/NavigateNext";
+import Breadcrumbs from "@components/s3/Breadcrumbs";
+import ObjectsDataGrid from "@components/s3/objectList/ObjectsDataGrid";
+
+import apiRoutes from "@configs/apiRoutes";
+import { Alert, AlertColor, Snackbar } from "@mui/material";
+import useModal from "@hooks/useModal";
+
+import { ObjectType } from "@interfaces/s3";
 
 export async function getServerSideProps(context: any) {
   const { bucketName } = context.params;
@@ -23,118 +27,71 @@ export async function getServerSideProps(context: any) {
   return { props: { objects: data } };
 }
 
-const DirObject = ({ dir }: any) => {
-  const router = useRouter();
-  const { bucketName } = router.query;
-
-  const routeToDirDetails = () => {
-    console.log(router);
-    router.push(`/ui/s3/${bucketName}?dir=${dir}`);
-  };
-
-  return (
-    <div className="text-green-500 cursor-pointer" onClick={routeToDirDetails}>
-      {dir?.split("/").slice(-2, -1) + "/"}
-    </div>
-  );
-};
-
-const ContentObject = ({ object }: any) => {
-  const router = useRouter();
-  const routeToObjectContent = () => {
-    // router.push(`${router.route}/${name}`);
-  };
-
-  return (
-    <div
-      className="text-orange-500 cursor-pointer"
-      onClick={routeToObjectContent}
-    >
-      {JSON.stringify(object)}
-    </div>
-  );
-};
-
-const Breakcrumds = ({ bucketName, dir }: any) => {
-  const breadcrumbs = [
-    <Link underline="hover" key="1" color="inherit" href="/ui/s3">
-      Buckets
-    </Link>,
-  ];
-
-  const dirPaths = dir?.split("/").slice(0, -1);
-  const dirs: any = [];
-
-  if (dirPaths?.length > 0) {
-    breadcrumbs.push(
-      <Link
-        underline="hover"
-        key="1"
-        color="inherit"
-        href={`/ui/s3/${bucketName}`}
-      >
-        {bucketName}
-      </Link>
-    );
-  } else {
-    breadcrumbs.push(
-      <Typography key="3" color="text.primary">
-        {bucketName}
-      </Typography>
-    );
-  }
-
-  dirPaths?.forEach((dirPath: string, index: number) => {
-    dirs.push(dirPath);
-    if (dirPaths.length - 1 === index) {
-      breadcrumbs.push(
-        <Typography key="3" color="text.primary">
-          {dirPath}
-        </Typography>
-      );
-      return;
-    }
-    breadcrumbs.push(
-      <Link
-        underline="hover"
-        key="1"
-        color="inherit"
-        href={`/ui/s3/${bucketName}?dir=${dirs.join("/") + "/"}`}
-      >
-        {dirPath}
-      </Link>
-    );
-  });
-
-  return (
-    <Breadcrumbs
-      separator={<NavigateNextIcon fontSize="small" />}
-      aria-label="breadcrumb"
-    >
-      {breadcrumbs}
-    </Breadcrumbs>
-  );
-};
-
 function BucketDetails({ objects }: any) {
   const router = useRouter();
   const { bucketName, dir } = router.query;
 
-  console.log(objects);
+  const [snackbarMsg, setSnackbarMsg] = useState("Bucket successfully deleted");
+  const [snackbarSeverity, setSnackbarSeverity] =
+    useState<AlertColor>("success");
+  const {
+    isModalOpen: isSnackbarOpen,
+    openModal: openSnackbar,
+    closeModal: closeSnackbar,
+  } = useModal();
+
+  const objectList = [
+    ...objects?.dirs?.map((dir: string, index: number) => ({
+      key: index,
+      name: dir?.split("/").slice(-2, -1) + "/",
+      type: ObjectType.FOLDER,
+      path: dir,
+    })),
+    ...objects?.objects?.map((object: any, index: number) => {
+      const { key, size, eTag, storageClass, lastModified } = object;
+      const file = key.split("/").slice(-1)?.[0] || "",
+        fileExtension = file.split(".")[1] || "";
+
+      return {
+        key: (objects?.dirs?.length || 0) + index,
+        name: file,
+        type: ObjectType.FILE,
+        extension: fileExtension,
+        size,
+        eTag,
+        storageClass,
+        lastModified,
+        path: key,
+      };
+    }),
+  ];
+
+  console.log(objectList);
   return (
-    <div>
-      <Breakcrumds bucketName={bucketName} dir={dir} />
-      <div>
-        {objects?.dirs?.map((dir: string, index: number) => (
-          <DirObject key={index} dir={dir} />
-        ))}
+    <>
+      <div className="p-4 flex flex-col w-full h-full gap-4">
+        <Breadcrumbs bucketName={bucketName} dir={dir} />
+        <ObjectsDataGrid
+          objectList={objectList}
+          openSnackbar={openSnackbar}
+          setSnackbarSeverity={setSnackbarSeverity}
+          setSnackbarMsg={setSnackbarMsg}
+        />
       </div>
-      <div>
-        {objects?.objects?.map((object: any, index: number) => (
-          <ContentObject key={index} object={object} />
-        ))}
-      </div>
-    </div>
+      <Snackbar
+        open={isSnackbarOpen}
+        autoHideDuration={3000}
+        onClose={closeSnackbar}
+      >
+        <Alert
+          onClose={closeSnackbar}
+          severity={snackbarSeverity}
+          sx={{ width: "100%" }}
+        >
+          {snackbarMsg}
+        </Alert>
+      </Snackbar>
+    </>
   );
 }
 
