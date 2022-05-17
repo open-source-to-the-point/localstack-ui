@@ -1,4 +1,5 @@
 import CircularProgress, {
+  circularProgressClasses,
   CircularProgressProps,
 } from "@mui/material/CircularProgress";
 import Typography from "@mui/material/Typography";
@@ -20,6 +21,12 @@ const CircularProgressWithLabel: React.FC<ICircularProgressWithLabelProps> = ({
         value={of ? (value / of) * 100 : 0}
         size="12rem"
         thickness={3}
+        sx={{
+          animationDuration: "2=0ms",
+          [`& .${circularProgressClasses.circle}`]: {
+            strokeLinecap: "round",
+          },
+        }}
       />
       <Box
         sx={{
@@ -38,6 +45,7 @@ const CircularProgressWithLabel: React.FC<ICircularProgressWithLabelProps> = ({
           variant="h4"
           fontWeight="bold"
           color="white"
+          sx={{ marginTop: "0.5rem" }}
         >{`${value} / ${of}`}</Typography>
         <Typography variant="subtitle1" color="white">
           Uploaded

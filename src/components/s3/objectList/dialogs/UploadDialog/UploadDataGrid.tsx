@@ -100,6 +100,15 @@ const UploadDataGrid: React.FC<IUploadDataGridProps> = ({
           />
         ),
       }}
+      componentsProps={{
+        panel: {
+          sx: {
+            [`& .MuiDataGrid-columnsPanel > div:first-of-type`]: {
+              display: "none",
+            },
+          },
+        },
+      }}
     />
   );
 };

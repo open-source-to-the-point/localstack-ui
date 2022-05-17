@@ -3,6 +3,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/router";
 import apiRoutes from "@configs/apiRoutes";
 
+import CircularProgressWithLabel from "@components/CircularProgressWithLabel";
 import {
   AlertColor,
   Backdrop,
@@ -12,18 +13,20 @@ import {
   DialogContent,
   DialogTitle,
   Input,
+  LinearProgress,
   Typography,
 } from "@mui/material";
 import UploadDataGrid from "./UploadDataGrid";
 import { Box } from "@mui/system";
-import AddIcon from "@mui/icons-material/Add";
-import RemoveIcon from "@mui/icons-material/Remove";
+import AddCircleIcon from "@mui/icons-material/AddCircle";
+import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
+
 import { IUploadObject } from "@interfaces/s3";
-import prettyBytes from "pretty-bytes";
 import { GridRowId } from "@mui/x-data-grid";
-import CircularProgressWithLabel from "@components/CircularProgressWithLabel";
-import useModal from "@hooks/useModal";
+import prettyBytes from "pretty-bytes";
 import { timeout } from "@utils/index";
+
+import useModal from "@hooks/useModal";
 
 interface IUploadDialogProps {
   isDialogOpen: boolean;
@@ -191,11 +194,12 @@ const UploadDialog: React.FC<IUploadDialogProps> = ({
             <div>
               <Button
                 variant="contained"
-                startIcon={<RemoveIcon />}
+                startIcon={<RemoveCircleIcon />}
                 sx={{
                   color: "white",
                   fontWeight: "bold",
                 }}
+                color="error"
                 onClick={() => {
                   setUploadOjectList(
                     uploadObjectList.filter(
@@ -209,7 +213,7 @@ const UploadDialog: React.FC<IUploadDialogProps> = ({
               </Button>
               <Button
                 variant="contained"
-                startIcon={<AddIcon />}
+                startIcon={<AddCircleIcon />}
                 sx={{ marginLeft: "1rem", color: "white", fontWeight: "bold" }}
                 onClick={() => {
                   filesUploadRef?.current?.click();
@@ -219,7 +223,7 @@ const UploadDialog: React.FC<IUploadDialogProps> = ({
               </Button>
               <Button
                 variant="contained"
-                startIcon={<AddIcon />}
+                startIcon={<AddCircleIcon />}
                 sx={{ marginLeft: "1rem", color: "white", fontWeight: "bold" }}
                 onClick={() => {
                   folderUploadRef?.current?.click();
@@ -284,13 +288,21 @@ const UploadDialog: React.FC<IUploadDialogProps> = ({
             right: 0,
             position: "absolute",
             display: "flex",
-            alignItems: "end",
-            justifyContent: "start",
+            flexDirection: "column",
+            alignItems: "start",
+            justifyContent: "end",
           }}
         >
           <Typography variant="body1" color="white" sx={{ margin: "1rem" }}>
             {lastUploadedObject}
           </Typography>
+          {/* <Box sx={{ width: "100%" }}>
+            <LinearProgress
+              variant="determinate"
+              sx={{ height: 10 }}
+              value={(progress / uploadObjectList.length) * 100}
+            />
+          </Box> */}
         </Box>
       </Backdrop>
     </>
