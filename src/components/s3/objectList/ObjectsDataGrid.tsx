@@ -24,7 +24,7 @@ import { getLocateDate } from "@utils/get-locale-time";
 import prettyBytes from "pretty-bytes";
 
 import { IObject, ObjectType } from "@interfaces/s3";
-import { AlertColor } from "@mui/material";
+import { AlertColor, Tooltip } from "@mui/material";
 
 interface IObjectsDataGridProps {
   objectList: IObject[];
@@ -120,7 +120,7 @@ const ObjectsDataGrid: React.FC<IObjectsDataGridProps> = ({
     {
       field: "size",
       headerName: "Size",
-      width: 100,
+      width: 75,
       disableColumnMenu: true,
       align: "right",
       valueFormatter: (params: GridValueFormatterParams) => {
@@ -134,16 +134,21 @@ const ObjectsDataGrid: React.FC<IObjectsDataGridProps> = ({
     {
       field: "storageClass",
       headerName: "Storage Class",
-      width: 150,
+      width: 100,
       hide: true,
       disableColumnMenu: true,
     },
     {
       field: "eTag",
       headerName: "eTag",
-      width: 250,
+      width: 275,
       hide: true,
       disableColumnMenu: true,
+      renderCell: (params: any) => (
+        <Tooltip title={params.value}>
+          <span>{params.value?.replaceAll('"', "")}</span>
+        </Tooltip>
+      ),
     },
   ];
   const actionColumns: GridActionsColDef[] = [
