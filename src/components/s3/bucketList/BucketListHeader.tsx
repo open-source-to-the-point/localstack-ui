@@ -10,7 +10,7 @@ import {
 import { AlertColor, Button } from "@mui/material";
 
 import AddCircleIcon from "@mui/icons-material/AddCircle";
-import CreateBucketDialog from "./CreateBucketDialog";
+import { CreateBucketDialog } from "./dialogs";
 
 interface IBucketListHeaderProps {
   bucketList: any;
