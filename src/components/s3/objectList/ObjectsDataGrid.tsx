@@ -195,9 +195,10 @@ const ObjectsDataGrid: React.FC<IObjectsDataGridProps> = ({
       columns={[...dataColumns, ...actionColumns]}
       getRowId={(row: typeof objectList[number]) => row.key}
       rows={objectList}
-      checkboxSelection
+      // checkboxSelection
       disableSelectionOnClick
-      hideFooterPagination={true}
+      hideFooterPagination
+      hideFooter
       onSelectionModelChange={(ids) => {
         setSelectedIds(ids);
       }}

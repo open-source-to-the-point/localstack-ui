@@ -11,11 +11,11 @@ import {
 } from "@mui/x-data-grid";
 import prettyBytes from "pretty-bytes";
 
-import { IUploadFile } from "@interfaces/s3";
+import { IUploadObject } from "@interfaces/s3";
 import { AlertColor, Tooltip, Typography } from "@mui/material";
 
 interface IUploadDataGridProps {
-  objectList: IUploadFile[];
+  objectList: IUploadObject[];
   setSelectedIds: React.Dispatch<React.SetStateAction<GridRowId[] | undefined>>;
   setSnackbarSeverity: React.Dispatch<React.SetStateAction<AlertColor>>;
   setSnackbarMsg: React.Dispatch<React.SetStateAction<string>>;
@@ -85,7 +85,8 @@ const UploadDataGrid: React.FC<IUploadDataGridProps> = ({
       rows={objectList}
       checkboxSelection
       disableSelectionOnClick
-      hideFooterPagination={true}
+      hideFooterPagination
+      hideFooter
       onSelectionModelChange={(ids) => {
         setSelectedIds(ids);
       }}

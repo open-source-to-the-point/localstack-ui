@@ -108,7 +108,8 @@ const BucketsDataGrid: React.FC<IBucketsDataGridProps> = ({
       getRowId={(row: IBucket) => row.key}
       rows={bucketList}
       disableSelectionOnClick
-      hideFooterPagination={true}
+      hideFooterPagination
+      hideFooter
       onSelectionModelChange={(ids) => {
         setSelectedIds(ids);
       }}
