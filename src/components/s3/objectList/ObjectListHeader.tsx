@@ -13,7 +13,7 @@ import { AlertColor, Button } from "@mui/material";
 import CreateNewFolderIcon from "@mui/icons-material/CreateNewFolder";
 import UploadIcon from "@mui/icons-material/Upload";
 
-import CreateFolderDialog from "./CreateFolderDialog";
+import { CreateFolderDialog, UploadDialog } from "./dialogs";
 
 interface IObjectListHeaderProps {
   objectList: any;
@@ -34,6 +34,11 @@ const ObjectListHeader: React.FC<IObjectListHeaderProps> = ({
     openModal: openCreateFolderDialog,
     closeModal: closeCreateFolderDialog,
   } = useModal();
+  const {
+    isModalOpen: isUploadDialogOpen,
+    openModal: openUploadDialog,
+    closeModal: closeUploadDialog,
+  } = useModal();
 
   return (
     <>
@@ -45,7 +50,7 @@ const ObjectListHeader: React.FC<IObjectListHeaderProps> = ({
           <div>
             <Button
               variant="contained"
-              className="text-white font-bold"
+              sx={{ color: "white", fontWeight: "bold" }}
               startIcon={<CreateNewFolderIcon />}
               onClick={openCreateFolderDialog}
             >
@@ -53,9 +58,9 @@ const ObjectListHeader: React.FC<IObjectListHeaderProps> = ({
             </Button>
             <Button
               variant="contained"
-              className="ml-4 text-white font-bold"
+              sx={{ marginLeft: "1rem", color: "white", fontWeight: "bold" }}
               startIcon={<UploadIcon />}
-              onClick={openCreateFolderDialog}
+              onClick={openUploadDialog}
             >
               Upload
             </Button>
@@ -73,6 +78,13 @@ const ObjectListHeader: React.FC<IObjectListHeaderProps> = ({
         setSnackbarSeverity={setSnackbarSeverity}
         setCreationMsg={setSnackbarMsg}
         openCreationSnackbar={openSnackbar}
+      />
+      <UploadDialog
+        isDialogOpen={isUploadDialogOpen}
+        closeDialog={closeUploadDialog}
+        setSnackbarSeverity={setSnackbarSeverity}
+        setUploadMsg={setSnackbarMsg}
+        openUploadSnackbar={openSnackbar}
       />
     </>
   );

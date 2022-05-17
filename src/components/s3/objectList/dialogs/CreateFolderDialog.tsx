@@ -96,7 +96,7 @@ const CreateFolderDialog: React.FC<ICreateFolderDialogProps> = ({
         <TextField
           inputRef={inputRef}
           id="name"
-          label="Folder Nma"
+          label="Folder Name"
           autoFocus
           margin="dense"
           type="text"
