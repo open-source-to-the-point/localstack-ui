@@ -94,7 +94,8 @@ const BucketListHeader: React.FC<IBucketListHeaderProps> = ({
           <div>
             <Button
               variant="contained"
-              startIcon={<AddCircleIcon />}
+              className="text-white font-bold"
+              startIcon={<AddCircleIcon htmlColor="#fff" />}
               onClick={openCreateBucketDialog}
             >
               Create Bucket
@@ -107,7 +108,12 @@ const BucketListHeader: React.FC<IBucketListHeaderProps> = ({
           <GridToolbarDensitySelector />
         </div>
       </GridToolbarContainer>
-      <Dialog open={isCreateBucketDialogOpen} onClose={closeCreateBucketDialog}>
+      <Dialog
+        open={isCreateBucketDialogOpen}
+        onClose={closeCreateBucketDialog}
+        maxWidth="md"
+        PaperProps={{ sx: { width: "30%" } }}
+      >
         <DialogTitle>Create Bucket</DialogTitle>
         <DialogContent>
           <TextField
