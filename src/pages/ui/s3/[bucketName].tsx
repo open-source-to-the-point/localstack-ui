@@ -41,7 +41,6 @@ function BucketDetails({ objects }: any) {
     closeModal: closeSnackbar,
   } = useModal();
 
-  console.log(objects);
   const objectList = [
     ...objects?.dirs?.map((dir: string, index: number) => ({
       key: index,
@@ -69,8 +68,6 @@ function BucketDetails({ objects }: any) {
         };
       }),
   ];
-
-  console.log(objectList);
 
   return (
     <>

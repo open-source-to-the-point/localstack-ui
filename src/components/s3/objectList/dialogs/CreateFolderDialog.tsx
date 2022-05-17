@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 
 import { useRouter } from "next/router";
 import apiRoutes from "@configs/apiRoutes";
@@ -34,8 +34,8 @@ const CreateFolderDialog: React.FC<ICreateFolderDialogProps> = ({
   const router = useRouter();
   const { bucketName, dir: currentDir } = router.query;
 
-  const inputRef = React.useRef<HTMLInputElement>();
-  React.useEffect(() => {
+  const inputRef = useRef<HTMLInputElement>();
+  useEffect(() => {
     const timeout = setTimeout(() => {
       if (inputRef.current) inputRef.current.focus();
     }, 100);

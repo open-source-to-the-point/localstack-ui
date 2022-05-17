@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 
 import { useRouter } from "next/router";
 import apiRoutes from "@configs/apiRoutes";
@@ -10,12 +10,16 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  Input,
   Typography,
 } from "@mui/material";
 import UploadDataGrid from "./UploadDataGrid";
 import { Box } from "@mui/system";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
+import { IUploadFile } from "@interfaces/s3";
+import prettyBytes from "pretty-bytes";
+import { GridRowId } from "@mui/x-data-grid";
 
 interface IUploadDialogProps {
   isDialogOpen: boolean;
@@ -32,11 +36,53 @@ const UploadDialog: React.FC<IUploadDialogProps> = ({
   setUploadMsg,
   openUploadSnackbar,
 }) => {
-  const [uploadOjectList, setUploadOjectList] = useState([]);
+  const [uploadObjectList, setUploadOjectList] = useState<IUploadFile[]>([]);
+  const [selectedIds, setSelectedIds] = useState<GridRowId[]>();
   const [folderName, setFolderName] = useState("");
+
+  const filesUploadRef = useRef<HTMLInputElement>();
+  const folderUploadRef = useRef<HTMLInputElement>();
 
   const router = useRouter();
   const { bucketName, dir: currentDir } = router.query;
+
+  const onSelectionChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const formattedFileList = Array.from(event.target.files || []).reduce<
+        IUploadFile[]
+      >((formattedFileList, file) => {
+        const { name, type, size, webkitRelativePath } = file;
+        const key = webkitRelativePath ? webkitRelativePath : name;
+
+        if (
+          !uploadObjectList.some((uploadObject) => uploadObject.key === key)
+        ) {
+          formattedFileList.push({
+            key,
+            file,
+            name: name,
+            folder: webkitRelativePath
+              ? webkitRelativePath.slice(0, -1 * name.length)
+              : "",
+            type: type,
+            size: size,
+          });
+        }
+
+        return formattedFileList;
+      }, []);
+
+      if (formattedFileList) {
+        setUploadOjectList([...uploadObjectList, ...formattedFileList]);
+      }
+      console.log(event.target.files);
+    },
+    [uploadObjectList]
+  );
+
+  useEffect(() => {
+    console.log(uploadObjectList);
+  }, [uploadObjectList]);
 
   const upload = useCallback(async () => {
     const presignedUrlResponse = await fetch(
@@ -91,7 +137,14 @@ const UploadDialog: React.FC<IUploadDialogProps> = ({
         >
           <Typography variant="body1">
             Files and Folders
-            {uploadOjectList.length > 0 ? `(${uploadOjectList.length})` : ""}
+            {uploadObjectList.length > 0
+              ? ` (${uploadObjectList.length}, ${prettyBytes(
+                  uploadObjectList.reduce(
+                    (totalSize, { size }) => totalSize + size,
+                    0
+                  )
+                )})`
+              : ""}
           </Typography>
           <div>
             <Button
@@ -101,7 +154,14 @@ const UploadDialog: React.FC<IUploadDialogProps> = ({
                 color: "white",
                 fontWeight: "bold",
               }}
-              onClick={() => {}}
+              onClick={() => {
+                setUploadOjectList(
+                  uploadObjectList.filter(
+                    (uploadObject) => !selectedIds?.includes(uploadObject.key)
+                  )
+                );
+                console.log(selectedIds);
+              }}
             >
               Remove
             </Button>
@@ -109,7 +169,9 @@ const UploadDialog: React.FC<IUploadDialogProps> = ({
               variant="contained"
               startIcon={<AddIcon />}
               sx={{ marginLeft: "1rem", color: "white", fontWeight: "bold" }}
-              onClick={() => {}}
+              onClick={() => {
+                filesUploadRef?.current?.click();
+              }}
             >
               Add Files
             </Button>
@@ -117,14 +179,35 @@ const UploadDialog: React.FC<IUploadDialogProps> = ({
               variant="contained"
               startIcon={<AddIcon />}
               sx={{ marginLeft: "1rem", color: "white", fontWeight: "bold" }}
-              onClick={() => {}}
+              onClick={() => {
+                folderUploadRef?.current?.click();
+              }}
             >
               Add Folder
             </Button>
+            <Input
+              inputRef={filesUploadRef}
+              type="file"
+              sx={{ display: "none" }}
+              inputProps={{
+                multiple: true,
+              }}
+              onChange={onSelectionChange}
+            ></Input>
+            <Input
+              inputRef={folderUploadRef}
+              type="file"
+              inputProps={{
+                webkitdirectory: "true",
+              }}
+              sx={{ display: "none" }}
+              onChange={onSelectionChange}
+            ></Input>
           </div>
         </Box>
         <UploadDataGrid
-          objectList={uploadOjectList}
+          objectList={uploadObjectList}
+          setSelectedIds={setSelectedIds}
           openSnackbar={openUploadSnackbar}
           setSnackbarSeverity={setSnackbarSeverity}
           setSnackbarMsg={setUploadMsg}
