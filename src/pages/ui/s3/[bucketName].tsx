@@ -9,6 +9,7 @@ import { Alert, AlertColor, Snackbar } from "@mui/material";
 import useModal from "@hooks/useModal";
 
 import { ObjectType } from "@interfaces/s3";
+import Head from "next/head";
 
 export async function getServerSideProps(context: any) {
   const { bucketName } = context.params;
@@ -40,6 +41,7 @@ function BucketDetails({ objects }: any) {
     closeModal: closeSnackbar,
   } = useModal();
 
+  console.log(objects);
   const objectList = [
     ...objects?.dirs?.map((dir: string, index: number) => ({
       key: index,
@@ -47,28 +49,34 @@ function BucketDetails({ objects }: any) {
       type: ObjectType.FOLDER,
       path: dir,
     })),
-    ...objects?.objects?.map((object: any, index: number) => {
-      const { key, size, eTag, storageClass, lastModified } = object;
-      const file = key.split("/").slice(-1)?.[0] || "",
-        fileExtension = file.split(".")[1] || "";
+    ...objects?.objects
+      ?.filter((object: any) => object.key?.split("/").slice(-1)?.[0] !== "")
+      .map((object: any, index: number) => {
+        const { key, size, eTag, storageClass, lastModified } = object;
+        const file = key.split("/").slice(-1)?.[0] || "",
+          fileExtension = file.split(".")[1] || "";
 
-      return {
-        key: (objects?.dirs?.length || 0) + index,
-        name: file,
-        type: ObjectType.FILE,
-        extension: fileExtension,
-        size,
-        eTag,
-        storageClass,
-        lastModified,
-        path: key,
-      };
-    }),
+        return {
+          key: (objects?.dirs?.length || 0) + index,
+          name: file,
+          type: ObjectType.FILE,
+          extension: fileExtension,
+          size,
+          eTag,
+          storageClass,
+          lastModified,
+          path: key,
+        };
+      }),
   ];
 
   console.log(objectList);
+
   return (
     <>
+      <Head>
+        <title>S3 Bucket: {bucketName}</title>
+      </Head>
       <div className="p-4 flex flex-col w-full h-full gap-4">
         <Breadcrumbs bucketName={bucketName} dir={dir} />
         <ObjectsDataGrid
