@@ -159,24 +159,31 @@ const ObjectsDataGrid: React.FC<IObjectsDataGridProps> = ({
           label="Delete"
           icon={<DeleteIcon />}
           onClick={async () => {
-            const bucketName = params.id;
-            const response = await fetch(
-              `${apiRoutes.ui.s3.deleteBucket}?bucket=${bucketName}`
-            );
-            if (response.status !== 200) {
-              console.debug(response);
-              setSnackbarSeverity("error");
-              setSnackbarMsg(`Error while deleting "${bucketName}"`);
-              openSnackbar();
-              return;
+            const { name, type, path } = params.row;
+
+            let apiUrl;
+            if (type === ObjectType.FOLDER) {
+              apiUrl = `${apiRoutes.ui.s3.deleteDir}?bucket=${bucketName}&dir=${path}`;
+            } else if (type === ObjectType.FILE) {
+              apiUrl = `${apiRoutes.ui.s3.deleteObject}?bucket=${bucketName}&key=${path}`;
             }
 
-            const { data } = await response.json();
+            if (apiUrl) {
+              const response = await fetch(apiUrl);
 
-            router.replace(router.asPath);
-            setSnackbarSeverity("success");
-            setSnackbarMsg(`"${bucketName}" successfully deleted`);
-            openSnackbar();
+              if (response.status !== 200) {
+                console.debug(response);
+                setSnackbarSeverity("error");
+                setSnackbarMsg(`Error while deleting "${name}"`);
+                openSnackbar();
+                return;
+              }
+              const { data } = await response.json();
+              router.replace(router.asPath);
+              setSnackbarSeverity("success");
+              setSnackbarMsg(`"${name}" successfully deleted`);
+              openSnackbar();
+            }
           }}
         />,
       ],
