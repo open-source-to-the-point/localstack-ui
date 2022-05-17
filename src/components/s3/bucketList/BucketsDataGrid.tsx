@@ -76,7 +76,8 @@ const BucketsDataGrid: React.FC<IBucketsDataGridProps> = ({
         <GridActionsCellItem
           key="delete"
           label="Delete"
-          icon={<DeleteIcon />}
+          icon={<DeleteIcon color="error" />}
+          title="Delete"
           onClick={async () => {
             const bucketName = params.id;
             const response = await fetch(

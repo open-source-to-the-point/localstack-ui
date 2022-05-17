@@ -162,7 +162,8 @@ const ObjectsDataGrid: React.FC<IObjectsDataGridProps> = ({
         <GridActionsCellItem
           key="delete"
           label="Delete"
-          icon={<DeleteIcon />}
+          icon={<DeleteIcon color="error" />}
+          title="Delete"
           onClick={async () => {
             const { name, type, path } = params.row;
 
