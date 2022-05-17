@@ -42,7 +42,7 @@ const BucketListHeader: React.FC<IBucketListHeaderProps> = ({
           <div>
             <Button
               variant="contained"
-              className="text-white font-bold"
+              sx={{ color: "white", fontWeight: "bold" }}
               startIcon={<AddCircleIcon htmlColor="#fff" />}
               onClick={openCreateBucketDialog}
             >
