@@ -29,7 +29,7 @@ export interface IFolderObject {
 
 export type IObject = IFileObject | IFolderObject;
 
-export interface IUploadFile {
+export interface IUploadObject {
   key: string;
   name: string;
   folder: string;
