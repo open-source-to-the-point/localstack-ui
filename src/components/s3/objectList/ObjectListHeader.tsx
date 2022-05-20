@@ -14,9 +14,10 @@ import CreateNewFolderIcon from "@mui/icons-material/CreateNewFolder";
 import UploadIcon from "@mui/icons-material/Upload";
 
 import { CreateFolderDialog, UploadDialog } from "./dialogs";
+import { IObject } from "@interfaces/s3";
 
 interface IObjectListHeaderProps {
-  objectList: any;
+  objectList: IObject[];
   selectedIds: GridRowId[] | undefined;
   setSnackbarSeverity: React.Dispatch<React.SetStateAction<AlertColor>>;
   setSnackbarMsg: React.Dispatch<React.SetStateAction<string>>;
@@ -75,6 +76,7 @@ const ObjectListHeader: React.FC<IObjectListHeaderProps> = ({
       <CreateFolderDialog
         isDialogOpen={isCreateFolderDialogOpen}
         closeDialog={closeCreateFolderDialog}
+        objectList={objectList}
         setSnackbarSeverity={setSnackbarSeverity}
         setCreationMsg={setSnackbarMsg}
         openCreationSnackbar={openSnackbar}
