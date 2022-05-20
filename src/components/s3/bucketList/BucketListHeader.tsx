@@ -11,9 +11,10 @@ import { AlertColor, Button } from "@mui/material";
 
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import { CreateBucketDialog } from "./dialogs";
+import { IBucket } from "@interfaces/s3";
 
 interface IBucketListHeaderProps {
-  bucketList: any;
+  bucketList: IBucket[];
   selectedIds: GridRowId[] | undefined;
   setSnackbarSeverity: React.Dispatch<React.SetStateAction<AlertColor>>;
   setSnackbarMsg: React.Dispatch<React.SetStateAction<string>>;
@@ -59,6 +60,7 @@ const BucketListHeader: React.FC<IBucketListHeaderProps> = ({
       <CreateBucketDialog
         isDialogOpen={isCreateBucketDialogOpen}
         closeDialog={closeCreateBucketDialog}
+        bucketList={bucketList}
         setSnackbarSeverity={setSnackbarSeverity}
         setCreationMsg={setSnackbarMsg}
         openCreationSnackbar={openSnackbar}

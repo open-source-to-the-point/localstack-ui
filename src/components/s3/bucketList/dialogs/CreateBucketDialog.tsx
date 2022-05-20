@@ -5,6 +5,7 @@ import apiRoutes from "@configs/apiRoutes";
 
 import {
   AlertColor,
+  Box,
   Button,
   Dialog,
   DialogActions,
@@ -13,11 +14,14 @@ import {
   DialogTitle,
   Link,
   TextField,
+  Typography,
 } from "@mui/material";
+import { IBucket } from "@interfaces/s3";
 
 interface ICreateBucketDialogProps {
   isDialogOpen: boolean;
   closeDialog: () => void;
+  bucketList: IBucket[];
   setSnackbarSeverity: React.Dispatch<React.SetStateAction<AlertColor>>;
   setCreationMsg: React.Dispatch<React.SetStateAction<string>>;
   openCreationSnackbar: () => void;
@@ -26,11 +30,13 @@ interface ICreateBucketDialogProps {
 const CreateBucketDialog: React.FC<ICreateBucketDialogProps> = ({
   isDialogOpen,
   closeDialog,
+  bucketList,
   setSnackbarSeverity,
   setCreationMsg,
   openCreationSnackbar,
 }) => {
   const [bucketName, setBucketName] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const router = useRouter();
 
@@ -46,6 +52,24 @@ const CreateBucketDialog: React.FC<ICreateBucketDialogProps> = ({
   }, [isDialogOpen]);
 
   const createBucket = useCallback(async () => {
+    // Validate Folder Name
+    if (!bucketName) {
+      setErrorMessage("Bucket Name is requried");
+      return;
+    }
+
+    if (bucketName.length < 3 || bucketName.length > 63) {
+      setErrorMessage(
+        "Bucket names must be between 3 (min) and 63 (max) characters long"
+      );
+      return;
+    }
+
+    if (bucketList.some((bucket) => bucket.name === bucketName)) {
+      setErrorMessage(`Bucket already exists`);
+      return;
+    }
+
     const response = await fetch(
       `${apiRoutes.ui.s3.createBucket}?bucket=${bucketName}`
     );
@@ -63,6 +87,7 @@ const CreateBucketDialog: React.FC<ICreateBucketDialogProps> = ({
     openCreationSnackbar();
     router.replace(router.asPath);
   }, [
+    bucketList,
     bucketName,
     openCreationSnackbar,
     router,
@@ -70,10 +95,16 @@ const CreateBucketDialog: React.FC<ICreateBucketDialogProps> = ({
     setSnackbarSeverity,
   ]);
 
+  const closeCreateBucketDialog = useCallback(() => {
+    closeDialog();
+    setBucketName("");
+    setErrorMessage("");
+  }, [closeDialog]);
+
   return (
     <Dialog
       open={isDialogOpen}
-      onClose={closeDialog}
+      onClose={closeCreateBucketDialog}
       maxWidth="md"
       PaperProps={{ sx: { width: "30%" } }}
     >
@@ -96,17 +127,22 @@ const CreateBucketDialog: React.FC<ICreateBucketDialogProps> = ({
             }
           }}
         />
-        <DialogContentText>
+        <Box lineHeight={0}>
+          <Typography variant="caption" color="error">
+            {errorMessage}
+          </Typography>
+        </Box>
+        {/* <DialogContentText>
           <Link
             href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucketnamingrules.html"
             target={"_blank"}
           >
             Naming Rules
           </Link>
-        </DialogContentText>
+        </DialogContentText> */}
       </DialogContent>
       <DialogActions>
-        <Button onClick={closeDialog}>Cancel</Button>
+        <Button onClick={closeCreateBucketDialog}>Cancel</Button>
         <Button variant="contained" onClick={createBucket}>
           Create
         </Button>
