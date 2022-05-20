@@ -68,6 +68,8 @@ const CreateFolderDialog: React.FC<ICreateFolderDialogProps> = ({
       return;
     }
 
+    // TODO: Object key naming doc: https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-keys.html
+
     // Create Folder
     const presignedUrlResponse = await fetch(
       `${apiRoutes.ui.s3.getPresignedUrl}?bucket=${bucketName}&key=${`${
@@ -141,15 +143,19 @@ const CreateFolderDialog: React.FC<ICreateFolderDialogProps> = ({
             }
           }}
         />
-        <Box lineHeight={0}>
-          <Typography variant="caption" color="error">
+        <Box lineHeight={1}>
+          <Typography variant="caption" color="error" lineHeight={1.5}>
             {errorMessage}
           </Typography>
         </Box>
       </DialogContent>
       <DialogActions>
         <Button onClick={closeCreateFolderDialog}>Cancel</Button>
-        <Button variant="contained" onClick={createFolder}>
+        <Button
+          variant="contained"
+          sx={{ marginLeft: "1rem", color: "white", fontWeight: "bold" }}
+          onClick={createFolder}
+        >
           Create
         </Button>
       </DialogActions>
