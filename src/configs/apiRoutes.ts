@@ -9,6 +9,8 @@ const apiRoutes = {
       getPresignedUrl: `${API_S3_ENDPOINT}/pre-signed-url`,
       listBuckets: `${API_S3_ENDPOINT}/list-buckets`,
       listObjects: `${API_S3_ENDPOINT}/list-objects`,
+      deleteDir: `${API_S3_ENDPOINT}/delete-dir`,
+      deleteObject: `${API_S3_ENDPOINT}/delete-object`,
     },
   },
 };

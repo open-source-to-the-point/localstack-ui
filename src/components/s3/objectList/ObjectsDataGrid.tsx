@@ -24,7 +24,7 @@ import { getLocateDate } from "@utils/get-locale-time";
 import prettyBytes from "pretty-bytes";
 
 import { IObject, ObjectType } from "@interfaces/s3";
-import { AlertColor } from "@mui/material";
+import { AlertColor, Tooltip } from "@mui/material";
 
 interface IObjectsDataGridProps {
   objectList: IObject[];
@@ -120,7 +120,7 @@ const ObjectsDataGrid: React.FC<IObjectsDataGridProps> = ({
     {
       field: "size",
       headerName: "Size",
-      width: 100,
+      width: 75,
       disableColumnMenu: true,
       align: "right",
       valueFormatter: (params: GridValueFormatterParams) => {
@@ -134,16 +134,21 @@ const ObjectsDataGrid: React.FC<IObjectsDataGridProps> = ({
     {
       field: "storageClass",
       headerName: "Storage Class",
-      width: 150,
+      width: 100,
       hide: true,
       disableColumnMenu: true,
     },
     {
       field: "eTag",
       headerName: "eTag",
-      width: 250,
+      width: 275,
       hide: true,
       disableColumnMenu: true,
+      renderCell: (params: any) => (
+        <Tooltip title={params.value}>
+          <span>{params.value?.replaceAll('"', "")}</span>
+        </Tooltip>
+      ),
     },
   ];
   const actionColumns: GridActionsColDef[] = [
@@ -157,26 +162,34 @@ const ObjectsDataGrid: React.FC<IObjectsDataGridProps> = ({
         <GridActionsCellItem
           key="delete"
           label="Delete"
-          icon={<DeleteIcon />}
+          icon={<DeleteIcon color="error" />}
+          title="Delete"
           onClick={async () => {
-            const bucketName = params.id;
-            const response = await fetch(
-              `${apiRoutes.ui.s3.deleteBucket}?bucket=${bucketName}`
-            );
-            if (response.status !== 200) {
-              console.debug(response);
-              setSnackbarSeverity("error");
-              setSnackbarMsg(`Error while deleting "${bucketName}"`);
-              openSnackbar();
-              return;
+            const { name, type, path } = params.row;
+
+            let apiUrl;
+            if (type === ObjectType.FOLDER) {
+              apiUrl = `${apiRoutes.ui.s3.deleteDir}?bucket=${bucketName}&dir=${path}`;
+            } else if (type === ObjectType.FILE) {
+              apiUrl = `${apiRoutes.ui.s3.deleteObject}?bucket=${bucketName}&key=${path}`;
             }
 
-            const { data } = await response.json();
+            if (apiUrl) {
+              const response = await fetch(apiUrl);
 
-            router.replace(router.asPath);
-            setSnackbarSeverity("success");
-            setSnackbarMsg(`"${bucketName}" successfully deleted`);
-            openSnackbar();
+              if (response.status !== 200) {
+                console.debug(response);
+                setSnackbarSeverity("error");
+                setSnackbarMsg(`Error while deleting "${name}"`);
+                openSnackbar();
+                return;
+              }
+              const { data } = await response.json();
+              router.replace(router.asPath);
+              setSnackbarSeverity("success");
+              setSnackbarMsg(`"${name}" successfully deleted`);
+              openSnackbar();
+            }
           }}
         />,
       ],
@@ -188,9 +201,10 @@ const ObjectsDataGrid: React.FC<IObjectsDataGridProps> = ({
       columns={[...dataColumns, ...actionColumns]}
       getRowId={(row: typeof objectList[number]) => row.key}
       rows={objectList}
-      checkboxSelection
+      // checkboxSelection
       disableSelectionOnClick
-      hideFooterPagination={true}
+      hideFooterPagination
+      hideFooter
       onSelectionModelChange={(ids) => {
         setSelectedIds(ids);
       }}

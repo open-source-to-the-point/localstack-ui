@@ -6,6 +6,7 @@ import useModal from "@hooks/useModal";
 import apiRoutes from "@configs/apiRoutes";
 
 import { IBucket } from "@interfaces/s3";
+import Head from "next/head";
 
 const S3BucketList = ({ bucketList }: { bucketList: IBucket[] }) => {
   const [snackbarMsg, setSnackbarMsg] = useState("Bucket successfully deleted");
@@ -28,6 +29,9 @@ const S3BucketList = ({ bucketList }: { bucketList: IBucket[] }) => {
 
   return (
     <>
+      <Head>
+        <title>S3 Bucket List</title>
+      </Head>
       <div className="p-4 flex justify-center w-full h-full">
         <BucketsDataGrid
           bucketList={bucketList}
