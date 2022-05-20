@@ -51,17 +51,42 @@ const CreateBucketDialog: React.FC<ICreateBucketDialogProps> = ({
     };
   }, [isDialogOpen]);
 
-  const createBucket = useCallback(async () => {
-    // Validate Folder Name
+  const validateBucketName = (bucketName: string) => {
     if (!bucketName) {
-      setErrorMessage("Bucket Name is requried");
-      return;
+      return "Bucket Name is requried";
     }
 
-    if (bucketName.length < 3 || bucketName.length > 63) {
-      setErrorMessage(
-        "Bucket names must be between 3 (min) and 63 (max) characters long"
-      );
+    // BUCKET_NAME_REGEX = (
+    //   r"(?=^.{3,63}$)(?!^(\d+\.)+\d+$)"
+    //   + r"(^(([a-z0-9]|[a-z0-9][a-z0-9\-]*[a-z0-9])\.)*([a-z0-9]|[a-z0-9][a-z0-9\-]*[a-z0-9])$)"
+
+    //> Naming rules doc: https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucketnamingrules.html
+    if (!/^.{3,63}$/.test(bucketName))
+      return "Bucket names must be between 3 (min) and 63 (max) characters long";
+
+    if (!/^[a-z\d\.-]*$/.test(bucketName))
+      return "Bucket names can consist only of lowercase letters, numbers, dots (.), and hyphens (-)";
+
+    if (!/^[a-z\d].*[a-z\d]$/.test(bucketName))
+      return "Bucket names must begin and end with a letter or number";
+
+    if (/^\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3}$/.test(bucketName))
+      return "Bucket names must not be formatted as an IP address (for example, 192.168.5.4)";
+
+    if (bucketName.startsWith("xn--"))
+      return "Bucket names must not start with the prefix xn--";
+
+    if (bucketName.endsWith("-s3alias"))
+      return "Bucket names must not end with the suffix -s3alias";
+
+    return "";
+  };
+
+  const createBucket = useCallback(async () => {
+    // Validate Folder Name
+    const validationError = validateBucketName(bucketName);
+    if (validationError) {
+      setErrorMessage(validationError);
       return;
     }
 
@@ -127,8 +152,8 @@ const CreateBucketDialog: React.FC<ICreateBucketDialogProps> = ({
             }
           }}
         />
-        <Box lineHeight={0}>
-          <Typography variant="caption" color="error">
+        <Box lineHeight={1}>
+          <Typography variant="caption" color="error" lineHeight={1.5}>
             {errorMessage}
           </Typography>
         </Box>
@@ -143,7 +168,11 @@ const CreateBucketDialog: React.FC<ICreateBucketDialogProps> = ({
       </DialogContent>
       <DialogActions>
         <Button onClick={closeCreateBucketDialog}>Cancel</Button>
-        <Button variant="contained" onClick={createBucket}>
+        <Button
+          variant="contained"
+          sx={{ marginLeft: "1rem", color: "white", fontWeight: "bold" }}
+          onClick={createBucket}
+        >
           Create
         </Button>
       </DialogActions>
