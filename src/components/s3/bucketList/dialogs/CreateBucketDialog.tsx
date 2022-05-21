@@ -56,9 +56,9 @@ const CreateBucketDialog: React.FC<ICreateBucketDialogProps> = ({
       return "Bucket Name is requried";
     }
 
-    // BUCKET_NAME_REGEX = (
-    //   r"(?=^.{3,63}$)(?!^(\d+\.)+\d+$)"
-    //   + r"(^(([a-z0-9]|[a-z0-9][a-z0-9\-]*[a-z0-9])\.)*([a-z0-9]|[a-z0-9][a-z0-9\-]*[a-z0-9])$)"
+    //> # see https://stackoverflow.com/questions/50480924/regex-for-s3-bucket-name#50484916
+    //> BUCKET_NAME_REGEX = (r'(?=^.{3,63}$)(?!^(\d+\.)+\d+$)' +
+    //>     r'(^(([a-z0-9]|[a-z0-9][a-z0-9\-]*[a-z0-9])\.)*([a-z0-9]|[a-z0-9][a-z0-9\-]*[a-z0-9])$)')
 
     //> Naming rules doc: https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucketnamingrules.html
     if (!/^.{3,63}$/.test(bucketName))
@@ -70,7 +70,14 @@ const CreateBucketDialog: React.FC<ICreateBucketDialogProps> = ({
     if (!/^[a-z\d].*[a-z\d]$/.test(bucketName))
       return "Bucket names must begin and end with a letter or number";
 
-    if (/^\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3}$/.test(bucketName))
+    if (/^(\d+\.)+\d+$/.test(bucketName))
+      return "Bucket name must not be in the format 00.11.22.33";
+
+    if (
+      /^((2(5[0-5]|[0-4][0-9])|[01]?[0-9]{1,2})\.){3}(2(5[0-5]|[0-4][0-9])|[01]?[0-9]{1,2})$/.test(
+        bucketName
+      )
+    )
       return "Bucket names must not be formatted as an IP address (for example, 192.168.5.4)";
 
     if (bucketName.startsWith("xn--"))
@@ -144,7 +151,10 @@ const CreateBucketDialog: React.FC<ICreateBucketDialogProps> = ({
           type="text"
           fullWidth
           variant="standard"
-          onChange={(event) => setBucketName(event.currentTarget.value)}
+          onChange={(event) => {
+            setErrorMessage("");
+            setBucketName(event.currentTarget.value);
+          }}
           onKeyPress={(event) => {
             if (event.key === "Enter") {
               event.preventDefault();
@@ -153,7 +163,12 @@ const CreateBucketDialog: React.FC<ICreateBucketDialogProps> = ({
           }}
         />
         <Box lineHeight={1}>
-          <Typography variant="caption" color="error" lineHeight={1.5}>
+          <Typography
+            variant="caption"
+            color="error"
+            lineHeight={1.5}
+            sx={{ whiteSpace: "pre-line" }}
+          >
             {errorMessage}
           </Typography>
         </Box>
