@@ -120,7 +120,7 @@ const ObjectsDataGrid: React.FC<IObjectsDataGridProps> = ({
     {
       field: "size",
       headerName: "Size",
-      width: 75,
+      width: 100,
       disableColumnMenu: true,
       align: "right",
       valueFormatter: (params: GridValueFormatterParams) => {
