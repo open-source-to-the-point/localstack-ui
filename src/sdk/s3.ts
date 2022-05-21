@@ -15,6 +15,7 @@ export interface IListObjects {
 
 const AWS_CONFIG = {
   endpoint: process.env.AWS_ENDPOINT || "http://localhost:4566",
+  region: process.env.AWS_REGION || 'eu-west-1',
   sslEnabled: process.env.AWS_ENDPOINT_SSL_ENABLED === "true" || false,
   forcePathStyle: process.env.AWS_S3_FORCE_PATH_STYLE === "true" || true,
 };

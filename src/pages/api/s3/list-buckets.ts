@@ -11,6 +11,7 @@ export default async function handler(
     const bucketDetails = await s3Service.listBuckets();
     res.status(status.OK).json({ code: status[200], data: bucketDetails });
   } catch (error: unknown) {
+    console.error(error);
     res
       .status(status.INTERNAL_SERVER_ERROR)
       .json({ code: "LIST_BUCKETS_FAILED", error });
