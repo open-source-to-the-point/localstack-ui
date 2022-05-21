@@ -63,12 +63,26 @@ const CreateFolderDialog: React.FC<ICreateFolderDialogProps> = ({
       return;
     }
 
+    //> Object key naming rule doc: https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-keys.html
+    if (!/^[a-zA-Z0-9!\-_.*'()]+$/.test(folderName)) {
+      setErrorMessage(`Bucket names can consist only of 
+        • Letters (a-zA-Z)
+        • Numbers (0-9)
+        • Exclamation point (!)
+        • Hyphen (-),
+        • Underscore (_),
+        • Period (.),
+        • Asterisk (*),
+        • Single quote ('),
+        • Open parenthesis ((),
+        • Close parenthesis ())`);
+      return;
+    }
+
     if (objectList.some((object) => object.name === `${folderName}/`)) {
       setErrorMessage(`Folder already exists`);
       return;
     }
-
-    // TODO: Object key naming doc: https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-keys.html
 
     // Create Folder
     const presignedUrlResponse = await fetch(
@@ -135,7 +149,10 @@ const CreateFolderDialog: React.FC<ICreateFolderDialogProps> = ({
           fullWidth
           variant="standard"
           required
-          onChange={(event) => setFolderName(event.currentTarget.value)}
+          onChange={(event) => {
+            setErrorMessage("");
+            setFolderName(event.currentTarget.value);
+          }}
           onKeyPress={(event) => {
             if (event.key === "Enter") {
               event.preventDefault();
@@ -144,7 +161,12 @@ const CreateFolderDialog: React.FC<ICreateFolderDialogProps> = ({
           }}
         />
         <Box lineHeight={1}>
-          <Typography variant="caption" color="error" lineHeight={1.5}>
+          <Typography
+            variant="caption"
+            color="error"
+            lineHeight={1.5}
+            sx={{ whiteSpace: "pre-line" }}
+          >
             {errorMessage}
           </Typography>
         </Box>
