@@ -1,4 +1,8 @@
-const API_ENDPOINT = `http://localhost:${process.env.PORT || 3000}`;
+import getConfig from "next/config";
+
+const { publicRuntimeConfig } = getConfig();
+
+const API_ENDPOINT = `http://localhost:${publicRuntimeConfig.PORT || 3000}`;
 const API_S3_ENDPOINT = `${API_ENDPOINT}/api/s3`;
 
 const apiRoutes = {
