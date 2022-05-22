@@ -1,4 +1,4 @@
-const API_ENDPOINT = "http://localhost:3000";
+const API_ENDPOINT = `http://localhost:${process.env.PORT || 3000}`;
 const API_S3_ENDPOINT = `${API_ENDPOINT}/api/s3`;
 
 const apiRoutes = {

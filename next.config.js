@@ -1,6 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  env: {
+    PORT: process.env.PORT,
+  },
   async redirects() {
     return [
       {
