@@ -18,3 +18,4 @@ jobs:
         echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USER }}" --password-stdin
         docker build -t ${{ secrets.DOCKER_USER }}/localstack-ui:latest -t ${{ secrets.DOCKER_USER }}/localstack-ui:${{ github.event.release.tag_name }} .
         docker push ${{ secrets.DOCKER_USER }}/localstack-ui:latest
+        docker push ${{ secrets.DOCKER_USER }}/localstack-ui:${{ github.event.release.tag_name }}
