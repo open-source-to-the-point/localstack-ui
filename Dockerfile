@@ -1,5 +1,6 @@
 FROM node:alpine
 
+ENV INSIDE_DOCKER=true
 RUN mkdir -p /usr/src/app
 
 WORKDIR /usr/src/app

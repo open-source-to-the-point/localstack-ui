@@ -1,4 +1,9 @@
-import { GetObjectCommand, PutObjectCommand, S3 } from "@aws-sdk/client-s3";
+import {
+  GetObjectCommand,
+  PutObjectCommand,
+  S3,
+  S3ClientConfig,
+} from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { IBucket } from "@interfaces/s3";
 
@@ -13,13 +18,18 @@ export interface IListObjects {
   }[];
 }
 
-const AWS_CONFIG = {
+const AWS_CONFIG: S3ClientConfig = {
   // Details for using this domain: https://stackoverflow.com/a/43541681
   endpoint:
     process.env.AWS_ENDPOINT ||
-    `host.docker.internal:${process.env.LOCASTACK_PORT || "4566"}`,
+    (process.env.INSIDE_DOCKER == "true"
+      ? `http://host.docker.internal:${process.env.LOCALSTACK_PORT || "4566"}`
+      : "http://localhost:4566"),
   region: process.env.AWS_REGION || "eu-west-1",
-  sslEnabled: process.env.AWS_ENDPOINT_SSL_ENABLED === "true" || false,
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID || "test",
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || "test",
+  },
   forcePathStyle: process.env.AWS_S3_FORCE_PATH_STYLE === "true" || true,
 };
 const PRESIGNED_URL_EXPIRY =
@@ -28,6 +38,7 @@ const PRESIGNED_URL_EXPIRY =
 class S3Service {
   private s3: S3;
   constructor() {
+    console.debug(AWS_CONFIG);
     this.s3 = new S3(AWS_CONFIG);
   }
 
