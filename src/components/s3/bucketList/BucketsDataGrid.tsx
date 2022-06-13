@@ -20,7 +20,7 @@ import apiRoutes from "@configs/apiRoutes";
 import { getLocaleTime, getLocateDate } from "@utils/get-locale-time";
 
 import { IBucket } from "@interfaces/s3";
-import { AlertColor } from "@mui/material";
+import { AlertColor, Stack } from "@mui/material";
 
 interface IBucketsDataGridProps {
   bucketList: IBucket[];
@@ -123,6 +123,16 @@ const BucketsDataGrid: React.FC<IBucketsDataGridProps> = ({
             setSnackbarMsg={setSnackbarMsg}
             openSnackbar={openSnackbar}
           />
+        ),
+        NoRowsOverlay: () => (
+          <Stack height="100%" alignItems="center" justifyContent="center">
+            No bucket found
+          </Stack>
+        ),
+        NoResultsOverlay: () => (
+          <Stack height="100%" alignItems="center" justifyContent="center">
+            No bucket found with the current filter
+          </Stack>
         ),
       }}
       componentsProps={{

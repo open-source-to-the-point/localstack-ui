@@ -24,7 +24,7 @@ import { getLocateDate } from "@utils/get-locale-time";
 import prettyBytes from "pretty-bytes";
 
 import { IObject, ObjectType } from "@interfaces/s3";
-import { AlertColor, Tooltip } from "@mui/material";
+import { AlertColor, Stack, Tooltip } from "@mui/material";
 
 interface IObjectsDataGridProps {
   objectList: IObject[];
@@ -217,6 +217,16 @@ const ObjectsDataGrid: React.FC<IObjectsDataGridProps> = ({
             setSnackbarMsg={setSnackbarMsg}
             openSnackbar={openSnackbar}
           />
+        ),
+        NoRowsOverlay: () => (
+          <Stack height="100%" alignItems="center" justifyContent="center">
+            No object found
+          </Stack>
+        ),
+        NoResultsOverlay: () => (
+          <Stack height="100%" alignItems="center" justifyContent="center">
+            No object found with the current filter
+          </Stack>
         ),
       }}
       componentsProps={{
