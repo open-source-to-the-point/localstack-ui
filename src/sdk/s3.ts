@@ -14,7 +14,10 @@ export interface IListObjects {
 }
 
 const AWS_CONFIG = {
-  endpoint: process.env.AWS_ENDPOINT || "http://localhost:4566",
+  // Details for using this domain: https://stackoverflow.com/a/43541681
+  endpoint:
+    process.env.AWS_ENDPOINT ||
+    `host.docker.internal:${process.env.LOCASTACK_PORT || "4566"}`,
   sslEnabled: process.env.AWS_ENDPOINT_SSL_ENABLED === "true" || false,
   forcePathStyle: process.env.AWS_S3_FORCE_PATH_STYLE === "true" || true,
 };
