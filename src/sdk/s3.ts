@@ -77,11 +77,15 @@ class S3Service {
       throw new Error("GetPresignedUrl: INVALID ACTION");
     }
 
-    const url = await getSignedUrl(
+    let url = await getSignedUrl(
       this.s3 as any,
       supportedActions[action] as any,
       { expiresIn: PRESIGNED_URL_EXPIRY }
     );
+
+    // TODO: Temporary Fix: Replacing 'host.docker.internal' with 'localhost'
+    url = url.replace("http://host.docker.internal", "http://localhost");
+
     return url;
   }
 
